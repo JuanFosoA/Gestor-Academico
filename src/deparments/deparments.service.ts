@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Department } from "./deparment.entity";
 import { Repository } from "typeorm";
@@ -10,29 +10,62 @@ export class DeparmentsService {
     @InjectRepository(Department)
     private deparmentRepository: Repository<Department>,
   ) { }
+  
+  async createDepartment(department: CreateDepartmentDto) {
+    const departmentFound = await this.deparmentRepository.findOne({
+      where: {
+        nombre: department.nombre
+      }
+    })
 
-  createDepartment(department: CreateDepartmentDto) {
+    if (departmentFound){
+      throw new HttpException('Department already exists', HttpStatus.CONFLICT);
+    }
+
     const newDepartment = this.deparmentRepository.create(department);
     return this.deparmentRepository.save(newDepartment);
   }
 
-  getDepartments() {
-    return this.deparmentRepository.find();
+  async getDepartments() {
+    return await this.deparmentRepository.find();
   }
 
-  getDepartment(id: number) {
-    return this.deparmentRepository.findOne({
+  async getDepartment(id: number) {
+    const departmentFound = await this.deparmentRepository.findOne({
       where: {
         id: id,
       },
     });
+
+    if (!departmentFound) {
+      throw new HttpException('Department not found', HttpStatus.NOT_FOUND);
+    }
+
+    return departmentFound
   }
 
-  deleteDepartment(id: number) {
-    return this.deparmentRepository.delete({ id })
+  async deleteDepartment(id: number) {
+    const result = await this.deparmentRepository.delete({ id })
+
+    if (result.affected === 0) {
+      throw new HttpException('Department not found', HttpStatus.NOT_FOUND);
+    }
+
+    return result
   }
 
-  updateDepartment(id: number, department: CreateDepartmentDto) {
-    return this.deparmentRepository.update({ id }, department)
+  async updateDepartment(id: number, department: CreateDepartmentDto) {
+    const departmentFound = await this.deparmentRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!departmentFound) {
+      throw new HttpException('Department not found', HttpStatus.NOT_FOUND);
+    }
+
+    const updateUser = Object.assign(departmentFound, department)
+    return this.deparmentRepository.save(updateUser)
   }
 }

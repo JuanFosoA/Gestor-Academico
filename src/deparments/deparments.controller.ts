@@ -1,24 +1,30 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Patch, Post } from "@nestjs/common";
-import { CreateDepartmentDto } from "./dto/create-department.dto";
-import { DeparmentsService } from "./deparments.service";
-import { Department } from "./deparment.entity";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { CreateDepartmentDto } from './dto/create-department.dto';
+import { DeparmentsService } from './deparments.service';
+import { Department } from './deparment.entity';
 
-@Controller("deparments")
+@Controller('deparments')
 export class DeparmentsController {
   constructor(private deparmentsService: DeparmentsService) {}
 
   @Get()
-  async getDepartments(): Promise<Department[]> {
-    const departments = await this.deparmentsService.getDepartments();
+  getDepartments(): Promise<Department[]> {
+    const departments = this.deparmentsService.getDepartments();
     return departments
   }
   
-  @Get(":id")
-  async getDepartment(@Param("id", ParseIntPipe) id: number): Promise<Department> {
-    const department = await this.deparmentsService.getDepartment(id);
-    if (!department) {
-      throw new NotFoundException(`Department with ID ${id} not found`);
-    }
+  @Get(':id')
+  getDepartment(@Param('id', ParseIntPipe) id: number) {
+    const department = this.deparmentsService.getDepartment(id);
     return department
   }
 
@@ -27,16 +33,21 @@ export class DeparmentsController {
     return this.deparmentsService.createDepartment(newDepartment);
   }
 
-  @Delete(":id")
-  async deleteDepartment(@Param("id", ParseIntPipe) id: number){
-    const deparment = await this.deparmentsService.deleteDepartment(id)
+  @Delete(':id')
+  deleteDepartment(@Param('id', ParseIntPipe) id: number) {
+    const deparment = this.deparmentsService.deleteDepartment(id)
     return deparment
   }
 
   @Patch(':id')
-  async updateDepartment(@Param('id', ParseIntPipe) id:number, 
-                  @Body() department: CreateDepartmentDto) {
-    const updatedDepartment = await this.deparmentsService.updateDepartment(id, department)
+  updateDepartment(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() department: CreateDepartmentDto,
+  ) {
+    const updatedDepartment = this.deparmentsService.updateDepartment(
+      id,
+      department,
+    );
     return updatedDepartment
   }
 }
