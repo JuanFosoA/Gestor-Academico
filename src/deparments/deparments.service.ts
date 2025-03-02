@@ -65,7 +65,7 @@ export class DeparmentsService {
       throw new HttpException('Department not found', HttpStatus.NOT_FOUND);
     }
 
-    const updateUser = Object.assign(departmentFound, department)
-    return this.deparmentRepository.save(updateUser)
+    const updateDepartment = Object.assign(departmentFound, department)
+    return this.deparmentRepository.save(updateDepartment)
   }
 }

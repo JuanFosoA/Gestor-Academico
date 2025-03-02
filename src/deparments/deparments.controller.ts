@@ -29,7 +29,7 @@ export class DeparmentsController {
   }
 
   @Post()
-  createUser(@Body() newDepartment: CreateDepartmentDto) {
+  createDepartment(@Body() newDepartment: CreateDepartmentDto) {
     return this.deparmentsService.createDepartment(newDepartment);
   }
 
