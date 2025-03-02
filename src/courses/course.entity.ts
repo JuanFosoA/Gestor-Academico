@@ -1,9 +1,11 @@
+import { Department } from 'src/deparments/department.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
 } from 'typeorm';
 
 export enum DiaSemana {
@@ -34,7 +36,7 @@ export class Course {
     inverseJoinColumn: { name: 'prerrequisito_id', referencedColumnName: 'id' },
   })
   prerrequisitos: Course[];
-  
+
   @Column({ type: 'enum', enum: DiaSemana })
   dia: DiaSemana;
 
@@ -43,4 +45,10 @@ export class Course {
 
   @Column({ type: 'time' })
   horaFin: string;
+
+  @Column()
+  departmentId: number
+
+  @ManyToOne(() => Department, (department) => department.courses)
+  department: Department;
 }

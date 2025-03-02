@@ -4,12 +4,14 @@ import { Course } from './course.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { DepartmentsService } from '../deparments/departments.service';
 
 @Injectable()
 export class CoursesService {
   constructor(
     @InjectRepository(Course)
     private courseRepository: Repository<Course>,
+    private deparmentsService: DepartmentsService,
   ) {}
 
   async createCourse(course: CreateCourseDto) {
@@ -21,6 +23,14 @@ export class CoursesService {
 
     if (courseFound) {
       throw new HttpException('Course already exists', HttpStatus.CONFLICT);
+    }
+    
+    const departmentFound = await this.deparmentsService.getDepartment(
+      course.departmentId,
+    );
+
+    if (!departmentFound) {
+      throw new HttpException('Department not found', HttpStatus.NOT_FOUND);
     }
 
     if (course.horaInicio >= course.horaFin) {
@@ -53,7 +63,7 @@ export class CoursesService {
 
   async getCourses() {
     return await this.courseRepository.find({
-      relations: ['prerrequisitos'],
+      relations: ['prerrequisitos', 'department'],
     });
   }
 
@@ -62,7 +72,7 @@ export class CoursesService {
       where: {
         id: id,
       },
-      relations: ['prerrequisitos'],
+      relations: ['prerrequisitos', 'department'],
     });
 
     if (!courseFound) {

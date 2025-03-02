@@ -7,4 +7,5 @@ export class CreateCourseDto {
   dia: DiaSemana;
   horaInicio: string;
   horaFin: string;
+  departmentId: number;
 }
