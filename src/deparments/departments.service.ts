@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { CoursesService } from 'src/courses/courses.service';
 import { Course } from 'src/courses/course.entity';
+import { Teacher } from 'src/teachers/teacher.entity';
 
 @Injectable()
 export class DepartmentsService {
@@ -14,6 +15,9 @@ export class DepartmentsService {
     
     @InjectRepository(Course)
     private readonly courseRepository: Repository<Course>,
+
+    @InjectRepository(Teacher)
+    private readonly teacherRepository: Repository<Teacher>,
   ) {}
 
   async createDepartment(department: CreateDepartmentDto) {
@@ -57,6 +61,17 @@ export class DepartmentsService {
     if (coursesCount > 0) {
       throw new HttpException(
         'No se puede eliminar el departamento porque tiene cursos asociados',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const teachersCount = await this.teacherRepository.count({
+      where: { department: { id } },
+    });
+
+    if (teachersCount > 0) {
+      throw new HttpException(
+        'No se puede eliminar el departamento porque tiene profesores asociados',
         HttpStatus.BAD_REQUEST,
       );
     }

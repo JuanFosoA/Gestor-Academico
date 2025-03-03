@@ -1,63 +1,81 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Teacher } from './teacher.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
+import { DepartmentsService } from 'src/deparments/departments.service';
+import { log } from 'node:console';
 
 @Injectable()
 export class TeachersService {
-    constructor(@InjectRepository(Teacher) 
-    private teacherRepository:Repository<Teacher>,
-    //private departmentService:DeparmentsService
-    ){}
+  constructor(
+    @InjectRepository(Teacher)
+    private teacherRepository: Repository<Teacher>,
+    private departmentService: DepartmentsService,
+  ) {}
 
-    async createTeacher(teacher:CreateTeacherDto){
-        /* const departmentFound = await this.departmentService.getDepartment(teacher.departmentID)
+  async createTeacher(teacher: CreateTeacherDto) {
+    const departmentFound = await this.departmentService.getDepartment(
+      teacher.departmentID,
+    );
 
-        if(!departmentFound) return new HttpException('Department not found',HttpStatus.NOT_FOUND) */
-            
-        const teacherFound = await this.teacherRepository.findOne({where:{documento:teacher.documento}})
-
-        if(teacherFound){
-            return new HttpException('Teacher already exist',HttpStatus.CONFLICT)
-        }
-
-        const newTeacher = this.teacherRepository.create(teacher)
-        return this.teacherRepository.save(newTeacher)
+    if (!departmentFound) {
+      throw new HttpException('Department not found', HttpStatus.NOT_FOUND);
     }
-    
-    getTeachers(){
-        return this.teacherRepository.find()
+    const teacherFound = await this.teacherRepository.findOne({
+      where: { documento: teacher.documento },
+    });
+
+    if (teacherFound) {
+      throw new HttpException('Teacher already exist', HttpStatus.CONFLICT);
     }
 
-    async getTeacher(documento:string){
-        const teacherFound = await this.teacherRepository.findOne({ where:{documento }})
+    const newTeacher = this.teacherRepository.create(teacher);
+    return this.teacherRepository.save(newTeacher);
+  }
 
-        if(!teacherFound){
-            return new HttpException('Teacher not found',HttpStatus.NOT_FOUND)
-        }
-        return teacherFound;
+  getTeachers() {
+    return this.teacherRepository.find({
+      relations: ['department'],
+    });
+  }
+
+  async getTeacher(documento: string) {
+    const teacherFound = await this.teacherRepository.findOne({
+      where: { documento },
+    });
+
+    if (!teacherFound) {
+      throw new HttpException('Teacher not found', HttpStatus.NOT_FOUND);
+    }
+    return teacherFound;
+  }
+
+  async deleteTeacher(documento: string) {
+    const result = await this.teacherRepository.delete({ documento });
+
+    if (result.affected === 0) {
+      throw new HttpException('Teacher not found', HttpStatus.NOT_FOUND);
+    }
+    return result;
+  }
+
+  async updateTeacher(documento: string, user: UpdateTeacherDto) {
+    if (user.departmentId) {
+      const department = await this.departmentService.getDepartment(
+        user.departmentId,
+      );
+      if (!department) {
+        throw new HttpException('Department not found', HttpStatus.NOT_FOUND);
+      }
     }
 
-    async deleteTeacher(documento:string){
-        const result = await this.teacherRepository.delete({documento})
+    const result = await this.teacherRepository.update({ documento }, user);
 
-        if(result.affected === 0){
-            return new HttpException('Teacher not found',HttpStatus.NOT_FOUND)
-        }
-        return result
+    if (result.affected === 0) {
+      throw new HttpException('Teacher not found', HttpStatus.NOT_FOUND);
     }
-
-    async updateTeacher(documento:string, user: UpdateTeacherDto){
-        const result = await this.teacherRepository.update({documento},user)
-
-        if(result.affected === 0){
-            return new HttpException('Teacher not found',HttpStatus.NOT_FOUND)
-        }
-        return result
-    }
-
-    
-
+    return result;
+  }
 }

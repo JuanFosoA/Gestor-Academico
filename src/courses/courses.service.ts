@@ -24,7 +24,7 @@ export class CoursesService {
     if (courseFound) {
       throw new HttpException('Course already exists', HttpStatus.CONFLICT);
     }
-    
+
     const departmentFound = await this.deparmentsService.getDepartment(
       course.departmentId,
     );
@@ -83,11 +83,6 @@ export class CoursesService {
   }
 
   async deleteCourse(id: number) {
-    const courseFound = await this.courseRepository.findOne({ where: { id } });
-    if (!courseFound) {
-      throw new HttpException('Course not found', HttpStatus.NOT_FOUND);
-    }
-
     const referencedCourses = await this.courseRepository.find({
       where: { prerrequisitos: { id } },
       relations: ['prerrequisitos'],
@@ -114,7 +109,6 @@ export class CoursesService {
       where: {
         id: id,
       },
-      relations: ['prerrequisitos'],
     });
 
     if (!courseFound) {
