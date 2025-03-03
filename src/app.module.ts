@@ -2,7 +2,10 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DepartmentsModule } from './deparments/departments.module';
-import {TypeOrmModule} from '@nestjs/typeorm'
+import {TypeOrmModule} from '@nestjs/typeorm';
+import { TeachersModule } from './teachers/teachers.module';
+import { RegistrationsModule } from './registrations/registrations.module';
+import { GradesModule } from './grades/grades.module';
 import { CoursesModule } from './courses/courses.module';
 import { StudentsModule } from './students/students.module';
 
@@ -20,7 +23,10 @@ import { StudentsModule } from './students/students.module';
     }),
     DepartmentsModule,
     CoursesModule,
-    StudentsModule],
+    StudentsModule,
+    TeachersModule,
+    RegistrationsModule,
+    GradesModule],
   controllers: [AppController],
   providers: [AppService],
 })
