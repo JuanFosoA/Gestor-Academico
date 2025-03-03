@@ -4,12 +4,17 @@ import { Student } from './student.entity';
 import { Repository } from 'typeorm';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
+import { Registration } from 'src/registrations/registration.entity';
+import { RegistrationStatus } from '../registrations/registration.entity';
 
 @Injectable()
 export class StudentsService {
   constructor(
     @InjectRepository(Student)
     private studentRepository: Repository<Student>,
+
+    @InjectRepository(Registration)
+    private readonly registrationRepository: Repository<Registration>,
   ) {}
 
   async createStudent(student: CreateStudentDto) {
@@ -39,10 +44,10 @@ export class StudentsService {
     return await this.studentRepository.find();
   }
 
-  async getStudent(id: number) {
+  async getStudent(cedula: string) {
     const studentFound = await this.studentRepository.findOne({
       where: {
-        id: id,
+        cedula: cedula,
       },
     });
 
@@ -53,20 +58,33 @@ export class StudentsService {
     return studentFound;
   }
 
-  async deleteStudent(id: number) {
-    const result = await this.studentRepository.delete({ id });
+  async deleteStudent(cedula: string) {
+    const activeRegistration = await this.registrationRepository.count({
+      where: {
+        studentCedula: cedula ,
+        estado: RegistrationStatus.CURSANDO,
+      },
+    });
+    
+    if (activeRegistration > 0) {
+      throw new HttpException(
+        'Cannot delete student: enrolled in an active registration',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const result = await this.studentRepository.delete({ cedula });
 
     if (result.affected === 0) {
       throw new HttpException('Student not found', HttpStatus.NOT_FOUND);
     }
-
     return result;
   }
 
-  async updateStudent(id: number, student: UpdateStudentDto) {
+  async updateStudent(cedula: string, student: UpdateStudentDto) {
     const studentFound = await this.studentRepository.findOne({
       where: {
-        id: id,
+        cedula: cedula,
       },
     });
 
@@ -74,8 +92,7 @@ export class StudentsService {
       throw new HttpException('Student not found', HttpStatus.NOT_FOUND);
     }
 
-    const updateStudent = Object.assign(studentFound, student)
-    return this.studentRepository.save(updateStudent)
-
+    const updateStudent = Object.assign(studentFound, student);
+    return this.studentRepository.save(updateStudent);
   }
 }

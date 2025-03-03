@@ -23,9 +23,9 @@ export class StudentsController {
     return students;
   }
 
-  @Get(':id')
-  getStudent(@Param('id', ParseIntPipe) id: number) {
-    const student = this.studentsService.getStudent(id);
+  @Get(':cedula')
+  getStudent(@Param('cedula') cedula: string) {
+    const student = this.studentsService.getStudent(cedula);
     return student;
   }
 
@@ -34,18 +34,18 @@ export class StudentsController {
     return this.studentsService.createStudent(newStudent);
   }
 
-  @Delete(':id')
-  deleteStudent(@Param('id', ParseIntPipe) id: number) {
-    const student = this.studentsService.deleteStudent(id);
+  @Delete(':cedula')
+  deleteStudent(@Param('cedula') cedula: string) {
+    const student = this.studentsService.deleteStudent(cedula);
     return student;
   }
 
-  @Patch(':id')
+  @Patch(':cedula')
   updateStudent(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('cedula') cedula: string,
     @Body() student: UpdateStudentDto,
   ) {
-    const updatedStudent = this.studentsService.updateStudent(id, student);
+    const updatedStudent = this.studentsService.updateStudent(cedula, student);
     return updatedStudent;
   }
 }

@@ -1,25 +1,60 @@
-import { Grade } from "src/grades/grade.entity";
-import { Teacher } from "src/teachers/teacher.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Course } from 'src/courses/course.entity';
+import { Grade } from 'src/grades/grade.entity';
+import { Student } from 'src/students/student.entity';
+import { Teacher } from 'src/teachers/teacher.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
-@Entity({name:'registrations'})
-export class Registration{
-    @PrimaryGeneratedColumn()
-    id:number
+export enum RegistrationStatus {
+  SIN_CURSAR = 'sin cursar',
+  CURSANDO = 'cursando',
+  REPROBADO = 'reprobado',
+  APROBADO = 'aprobado',
+}
 
-    @Column()
-    fecha_inscripcion:Date
+@Entity({ name: 'registrations' })
+export class Registration {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({nullable:true})
-    nota_final : number
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  fecha_inscripcion: Date;
 
-    @Column()
-    teacherDocumento: string
+  @Column({ nullable: true })
+  nota_final: number;
 
-    @OneToOne(()=>Grade)
-    @JoinColumn()
-    grade: Grade
+  @Column()
+  teacherDocumento: string;
 
-    @ManyToOne(()=>Teacher, teacher=>teacher.registrations)
-    teacher:Teacher
+  @Column()
+  courseId: number;
+
+  @Column()
+  studentCedula: string;
+
+  @Column({
+    type: 'enum',
+    enum: RegistrationStatus,
+    default: RegistrationStatus.SIN_CURSAR,
+  })
+  estado: RegistrationStatus;
+
+  @OneToOne(() => Grade)
+  @JoinColumn()
+  grade: Grade;
+
+  @ManyToOne(() => Teacher, (teacher) => teacher.registrations)
+  teacher: Teacher;
+
+  @ManyToOne(() => Course, (course) => course.registrations)
+  course: Course;
+
+  @ManyToOne(() => Student, (student) => student.registrations)
+  student: Student;
 }

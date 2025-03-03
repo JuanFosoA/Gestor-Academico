@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { DepartmentsService } from '../deparments/departments.service';
+import { Registration, RegistrationStatus } from 'src/registrations/registration.entity';
 
 @Injectable()
 export class CoursesService {
@@ -12,6 +13,9 @@ export class CoursesService {
     @InjectRepository(Course)
     private courseRepository: Repository<Course>,
     private deparmentsService: DepartmentsService,
+
+    @InjectRepository(Registration)
+    private readonly registrationRepository: Repository<Registration>,
   ) {}
 
   async createCourse(course: CreateCourseDto) {
@@ -92,6 +96,20 @@ export class CoursesService {
       throw new HttpException(
         'Cannot delete course because it is a prerequisite for other courses',
         HttpStatus.CONFLICT,
+      );
+    }
+
+    const activeRegistration = await this.registrationRepository.count({
+      where: {
+        courseId: id,
+        estado: RegistrationStatus.CURSANDO,
+      },
+    });
+
+    if (activeRegistration > 0) {
+      throw new HttpException(
+        'Cannot delete course: enrolled in an active registration',
+        HttpStatus.BAD_REQUEST,
       );
     }
 

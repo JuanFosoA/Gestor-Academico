@@ -1,44 +1,57 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Registration } from './registration.entity';
+import { Registration, RegistrationStatus } from './registration.entity';
 import { Repository } from 'typeorm';
 import { CreateRegistrationDto } from './dto/create-registration-dto';
 import { UpdateRegistrationDto } from './dto/update-registration-dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TeachersService } from 'src/teachers/teachers.service';
+import { CoursesService } from 'src/courses/courses.service';
+import { StudentsService } from 'src/students/students.service';
 
 @Injectable()
 export class RegistrationsService {
   constructor(
     @InjectRepository(Registration)
     private registrationRepository: Repository<Registration>,
-    private teacherService: TeachersService
+    private teacherService: TeachersService,
+    private coursesService: CoursesService,
+    private studentsService: StudentsService,
   ) {}
 
   async createRegistration(registration: CreateRegistrationDto) {
-    const teacherFound = await this.teacherService.getTeacher(
-      registration.teacherDocumento
-    );
+    const { studentCedula, courseId, teacherDocumento } = registration;
 
-    if (!teacherFound)
-      return new HttpException('Teacher not found', HttpStatus.NOT_FOUND);
+    await this.teacherService.getTeacher(teacherDocumento);
+    await this.studentsService.getStudent(studentCedula);
+    await this.coursesService.getCourse(courseId);
 
-    const registrationFound = await this.registrationRepository.findOne({
-      where: { id: registration.id },
+    const existingRegistration = await this.registrationRepository.findOne({
+      where: { studentCedula, courseId },
+      order: { fecha_inscripcion: 'DESC' },
     });
 
-    if (registrationFound) {
-      return new HttpException(
-        'Registration already exist',
+    if (
+      existingRegistration &&
+      existingRegistration.estado !== RegistrationStatus.REPROBADO &&
+      existingRegistration.estado !== RegistrationStatus.SIN_CURSAR
+    ) {
+      throw new HttpException(
+        'Student cannot enroll in this course again',
         HttpStatus.CONFLICT,
       );
     }
 
-    const newregistration = this.registrationRepository.create(registration);
-    return this.registrationRepository.save(newregistration);
+    const newRegistration = this.registrationRepository.create({
+      ...registration,
+      estado: RegistrationStatus.CURSANDO,
+    });
+
+    return this.registrationRepository.save(newRegistration);
+
   }
 
-  getRegistrations() {
-    return this.registrationRepository.find();
+  async getRegistrations() {
+    return await this.registrationRepository.find();
   }
 
   async getRegistration(id: number) {

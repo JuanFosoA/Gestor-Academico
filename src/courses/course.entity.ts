@@ -1,4 +1,5 @@
 import { Department } from 'src/deparments/department.entity';
+import { Registration } from 'src/registrations/registration.entity';
 import {
   Entity,
   Column,
@@ -6,6 +7,7 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 
 export enum DiaSemana {
@@ -51,4 +53,7 @@ export class Course {
 
   @ManyToOne(() => Department, (department) => department.courses)
   department: Department;
+
+  @OneToMany(() => Registration, (registration) => registration.course)
+  registrations: Registration[];
 }
