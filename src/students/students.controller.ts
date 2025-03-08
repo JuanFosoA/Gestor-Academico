@@ -7,13 +7,16 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { Student } from './student.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guards';
 
 @Controller('students')
+@UseGuards(JwtAuthGuard)
 export class StudentsController {
   constructor(private studentsService: StudentsService) {}
 
