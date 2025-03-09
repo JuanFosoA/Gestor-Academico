@@ -51,4 +51,5 @@ export class CoursesController {
     const updatedCourse = this.courseService.updateCourse(id, course);
     return updatedCourse;
   }
+
 }

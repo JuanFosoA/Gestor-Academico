@@ -5,7 +5,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { DepartmentsService } from '../deparments/departments.service';
-import { Registration, RegistrationStatus } from 'src/registrations/registration.entity';
+import {
+  Registration,
+  RegistrationStatus,
+} from 'src/registrations/registration.entity';
 
 @Injectable()
 export class CoursesService {
@@ -101,7 +104,7 @@ export class CoursesService {
 
     const activeRegistration = await this.registrationRepository.count({
       where: {
-        course: {id},
+        course: { id },
         estado: RegistrationStatus.CURSANDO,
       },
     });
@@ -153,5 +156,16 @@ export class CoursesService {
       prerrequisitos: courseFound.prerrequisitos,
     });
     return this.courseRepository.save(updateCourse);
+  }
+
+  async getPrerequisites(prerrequisitos: number[]): Promise<string[]> {
+    if (!prerrequisitos || prerrequisitos.length === 0) return [];
+
+    const prerequisites = await this.dataSource.query(
+      `SELECT nombre FROM courses WHERE id = ANY($1)`,
+      [prerrequisitos],
+    );
+
+    return prerequisites.map((p) => p.nombre);
   }
 }
