@@ -20,7 +20,7 @@ export class Teacher {
   nombre: string;
 
   @Column({ type: 'date' })
-  fecha_contrato: Date;
+  fechaContrato: Date;
 
   @Column()
   departmentId: number;

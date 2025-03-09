@@ -101,7 +101,7 @@ export class CoursesService {
 
     const activeRegistration = await this.registrationRepository.count({
       where: {
-        courseId: id,
+        course: {id},
         estado: RegistrationStatus.CURSANDO,
       },
     });
