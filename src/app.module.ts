@@ -5,9 +5,9 @@ import { DepartmentsModule } from './deparments/departments.module';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import { TeachersModule } from './teachers/teachers.module';
 import { RegistrationsModule } from './registrations/registrations.module';
-import { GradesModule } from './grades/grades.module';
 import { CoursesModule } from './courses/courses.module';
 import { StudentsModule } from './students/students.module';
+import { TestModule } from './test/test.module';
 
 @Module({
   imports: [
@@ -26,7 +26,7 @@ import { StudentsModule } from './students/students.module';
     StudentsModule,
     TeachersModule,
     RegistrationsModule,
-    GradesModule],
+    TestModule],
   controllers: [AppController],
   providers: [AppService],
 })

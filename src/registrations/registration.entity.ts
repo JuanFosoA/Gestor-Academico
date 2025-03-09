@@ -1,5 +1,4 @@
 import { Course } from 'src/courses/course.entity';
-import { Grade } from 'src/grades/grade.entity';
 import { Student } from 'src/students/student.entity';
 import { Teacher } from 'src/teachers/teacher.entity';
 import {
@@ -44,10 +43,6 @@ export class Registration {
     default: RegistrationStatus.SIN_CURSAR,
   })
   estado: RegistrationStatus;
-
-  @OneToOne(() => Grade)
-  @JoinColumn()
-  grade: Grade;
 
   @ManyToOne(() => Teacher, (teacher) => teacher.registrations)
   teacher: Teacher;

@@ -1,5 +1,5 @@
 export class UpdateTeacherDto{
     nombre?:string
-    fecha_contrato?:Date
+    fechaContrato?:Date
     departmentId?:number
 }

@@ -1,5 +1,6 @@
 import { Department } from 'src/deparments/department.entity';
 import { Registration } from 'src/registrations/registration.entity';
+import { Test } from 'src/test/test.entity';
 import {
   Entity,
   Column,
@@ -56,4 +57,7 @@ export class Course {
 
   @OneToMany(() => Registration, (registration) => registration.course)
   registrations: Registration[];
+
+  @OneToMany(()=>Test,(test)=>test.course)
+  tests:Test[]
 }

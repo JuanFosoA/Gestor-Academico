@@ -1,6 +1,6 @@
 export class CreateTeacherDto {
   documento: string;
   nombre: string;
-  fecha_contrato: Date;
+  fechaContrato: Date;
   departmentID: number;
 }
