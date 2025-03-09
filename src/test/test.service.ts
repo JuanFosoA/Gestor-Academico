@@ -8,6 +8,9 @@ import { UpdateTestDto } from './dto/update-test-dto';
 import { Test } from './test.entity';
 import { Registration } from 'src/registrations/registration.entity';
 
+/**
+ * Servicio encargado de la gestión de pruebas (Tests).
+ */
 @Injectable()
 export class TestService {
   constructor(
@@ -16,9 +19,17 @@ export class TestService {
     private coursesService: CoursesService,
     private studetService: StudentsService,
     @InjectRepository(Registration)
-    private registrationRepository:Repository<Registration>
+    private registrationRepository: Repository<Registration>
   ) {}
-  private averageCache: { [key: string]: number | null } = {}
+
+  /**
+   * Caché para almacenar promedios de calificaciones.
+   */
+  private averageCache: { [key: string]: number | null } = {};
+
+  /**
+   * Crea una nueva prueba.
+   */
   async createTest(test: CreateTestDto) {
     const { courseId, studentDocument } = test;
 
@@ -36,10 +47,16 @@ export class TestService {
     };
   }
 
+  /**
+   * Obtiene todas las pruebas registradas.
+   */
   async getTests() {
     return await this.testRepository.find();
   }
 
+  /**
+   * Obtiene una prueba específica por código.
+   */
   async getTest(codigo: string) {
     const testFound = await this.testRepository.findOne({
       where: { codigo },
@@ -51,6 +68,9 @@ export class TestService {
     return testFound;
   }
 
+  /**
+   * Elimina una prueba por código.
+   */
   async deleteTest(codigo: string) {
     const result = await this.testRepository.delete({ codigo });
 
@@ -60,6 +80,9 @@ export class TestService {
     return result;
   }
 
+  /**
+   * Actualiza una prueba por código.
+   */
   async updatetest(codigo: string, test: UpdateTestDto) {
     const result = await this.testRepository.update({ codigo }, test);
 
@@ -69,6 +92,9 @@ export class TestService {
     return result;
   }
 
+  /**
+   * Obtiene el promedio de calificaciones de un estudiante en un curso.
+   */
   async getAverageGrade(
     studentDocument: string,
     courseId: number,
@@ -83,6 +109,9 @@ export class TestService {
     return result?.average ? parseFloat(result.average) : null;
   }
 
+  /**
+   * Actualiza la calificación final de un estudiante en su registro de inscripción.
+   */
   async updateEnrollmentGrade(studentDocument: string, courseId: number, average: number) {
     await this.registrationRepository
         .createQueryBuilder()
@@ -91,5 +120,5 @@ export class TestService {
         .where('studentDocument = :studentDocument', { studentDocument })
         .andWhere('courseId = :courseId', { courseId })
         .execute();
-}
+  }
 }

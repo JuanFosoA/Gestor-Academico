@@ -7,6 +7,9 @@ import { UpdateStudentDto } from './dto/update-student.dto';
 import { Registration } from 'src/registrations/registration.entity';
 import { RegistrationStatus } from '../registrations/registration.entity';
 
+/**
+ * Servicio para la gestión de estudiantes.
+ */
 @Injectable()
 export class StudentsService {
   constructor(
@@ -17,6 +20,12 @@ export class StudentsService {
     private readonly registrationRepository: Repository<Registration>,
   ) {}
 
+  /**
+   * Crea un nuevo estudiante en la base de datos.
+   * @param student Datos del estudiante a crear.
+   * @throws HttpException Si el estudiante ya existe o si la fecha de nacimiento no es válida.
+   * @returns El estudiante creado.
+   */
   async createStudent(student: CreateStudentDto) {
     const studentFound = await this.studentRepository.findOne({
       where: {
@@ -40,10 +49,20 @@ export class StudentsService {
     return this.studentRepository.save(newStudent);
   }
 
+  /**
+   * Obtiene la lista de todos los estudiantes.
+   * @returns Lista de estudiantes.
+   */
   async getStudents() {
     return await this.studentRepository.find();
   }
 
+  /**
+   * Obtiene la información de un estudiante por su cédula.
+   * @param cedula Cédula del estudiante.
+   * @throws HttpException Si el estudiante no se encuentra.
+   * @returns Información del estudiante encontrado.
+   */
   async getStudent(cedula: string) {
     const studentFound = await this.studentRepository.findOne({
       where: {
@@ -58,6 +77,12 @@ export class StudentsService {
     return studentFound;
   }
 
+  /**
+   * Elimina un estudiante de la base de datos.
+   * @param cedula Cédula del estudiante a eliminar.
+   * @throws HttpException Si el estudiante está inscrito en un curso activo o no existe.
+   * @returns Resultado de la operación de eliminación.
+   */
   async deleteStudent(cedula: string) {
     const activeRegistration = await this.registrationRepository.count({
       where: {
@@ -81,6 +106,13 @@ export class StudentsService {
     return result;
   }
 
+  /**
+   * Actualiza la información de un estudiante.
+   * @param cedula Cédula del estudiante a actualizar.
+   * @param student Datos actualizados del estudiante.
+   * @throws HttpException Si el estudiante no se encuentra en la base de datos.
+   * @returns El estudiante actualizado.
+   */
   async updateStudent(cedula: string, student: UpdateStudentDto) {
     const studentFound = await this.studentRepository.findOne({
       where: {

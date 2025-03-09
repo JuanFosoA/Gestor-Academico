@@ -9,17 +9,17 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
-    PassportModule,
+    PassportModule, // Módulo de autenticación para gestionar estrategias de Passport
     JwtModule.register({
       secret:
-        '3462c20a13d79ed34862ddbd751d53f04584e14763905a3dace1cf26ad3060e4',
+        '3462c20a13d79ed34862ddbd751d53f04584e14763905a3dace1cf26ad3060e4', // Clave secreta para la firma de tokens JWT
       signOptions: {
-        expiresIn: '1h',
+        expiresIn: '1h', // Expiración del token en 1 hora
       },
     }),
-    UsersModule,
+    UsersModule, // Importa el módulo de usuarios para gestionar la autenticación
   ],
-  controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  controllers: [AuthController], // Controlador encargado de manejar las rutas de autenticación
+  providers: [AuthService, LocalStrategy, JwtStrategy], // Servicios y estrategias para autenticación
 })
 export class AuthModule {}

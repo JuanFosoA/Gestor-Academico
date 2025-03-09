@@ -1,33 +1,70 @@
-import { Course } from "src/courses/course.entity";
-import { Student } from "src/students/student.entity";
-import { Collection, Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Course } from 'src/courses/course.entity';
+import { Student } from 'src/students/student.entity';
+import {
+  Collection,
+  Column,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
-@Entity({name:'tests'})
-export class Test{
-    @PrimaryGeneratedColumn()
-    id:number
+/**
+ * Entidad que representa una prueba (test).
+ */
+@Entity({ name: 'tests' })
+export class Test {
+  /**
+   * Identificador único de la prueba.
+   */
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({unique:true})
-    codigo:string
+  /**
+   * Código único de la prueba.
+   */
+  @Column({ unique: true })
+  codigo: string;
 
-    @Column()
-    descripcion:string
+  /**
+   * Descripción de la prueba.
+   */
+  @Column()
+  descripcion: string;
 
-    @Column({type:'date'})
-    fecha:Date
+  /**
+   * Fecha en que se realiza la prueba.
+   */
+  @Column({ type: 'date' })
+  fecha: Date;
 
-    @Column()
-    courseId:number
+  /**
+   * Identificador del curso asociado a la prueba.
+   */
+  @Column()
+  courseId: number;
 
-    @Column()
-    studentDocument:string
+  /**
+   * Documento del estudiante que realizó la prueba.
+   */
+  @Column()
+  studentDocument: string;
 
-    @Column('decimal', { precision: 5, scale: 2, nullable: true })
-    grade:number
+  /**
+   * Calificación obtenida en la prueba.
+   */
+  @Column('decimal', { precision: 5, scale: 2, nullable: true })
+  grade: number;
 
-    @ManyToOne(()=>Course,(course)=>course.tests)
-    course: Course
+  /**
+   * Relación con el curso al que pertenece la prueba.
+   */
+  @ManyToOne(() => Course, (course) => course.tests)
+  course: Course;
 
-    @ManyToOne(()=>Student,(student)=>student.tests)
-    student:Student
+  /**
+   * Relación con el estudiante que realizó la prueba.
+   */
+  @ManyToOne(() => Student, (student) => student.tests)
+  student: Student;
 }

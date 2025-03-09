@@ -21,6 +21,12 @@ export class CoursesService {
     private readonly registrationRepository: Repository<Registration>,
   ) {}
 
+  /**
+   * Crea un nuevo curso si no existe y si su departamento es válido.
+   * @param {CreateCourseDto} course - Datos del curso a crear.
+   * @returns {Promise<Course>} Curso creado.
+   * @throws {HttpException} Si el curso ya existe, el departamento no se encuentra o hay errores en las horas.
+   */
   async createCourse(course: CreateCourseDto) {
     const courseFound = await this.courseRepository.findOne({
       where: {
@@ -68,17 +74,25 @@ export class CoursesService {
     return this.courseRepository.save(newCourse);
   }
 
+  /**
+   * Obtiene todos los cursos con sus prerrequisitos y departamentos.
+   * @returns {Promise<Course[]>} Lista de cursos.
+   */
   async getCourses() {
     return await this.courseRepository.find({
       relations: ['prerrequisitos', 'department'],
     });
   }
 
+  /**
+   * Obtiene un curso por su ID.
+   * @param {number} id - ID del curso a buscar.
+   * @returns {Promise<Course>} Curso encontrado.
+   * @throws {HttpException} Si el curso no existe.
+   */
   async getCourse(id: number) {
     const courseFound = await this.courseRepository.findOne({
-      where: {
-        id: id,
-      },
+      where: { id },
       relations: ['prerrequisitos', 'department'],
     });
 
@@ -89,7 +103,14 @@ export class CoursesService {
     return courseFound;
   }
 
+  /**
+   * Elimina un curso si no es un prerrequisito de otro curso y si no tiene estudiantes activos.
+   * @param {number} id - ID del curso a eliminar.
+   * @returns {Promise<any>} Resultado de la operación.
+   * @throws {HttpException} Si el curso no se puede eliminar.
+   */
   async deleteCourse(id: number) {
+    // Verificar si el curso es un prerrequisito de otros cursos
     const referencedCourses = await this.courseRepository.find({
       where: { prerrequisitos: { id } },
       relations: ['prerrequisitos'],
@@ -102,6 +123,7 @@ export class CoursesService {
       );
     }
 
+    // Verificar si hay inscripciones activas en el curso
     const activeRegistration = await this.registrationRepository.count({
       where: {
         course: { id },
@@ -125,12 +147,15 @@ export class CoursesService {
     return result;
   }
 
+  /**
+   * Actualiza los datos de un curso existente.
+   * @param {number} id - ID del curso a actualizar.
+   * @param {UpdateCourseDto} course - Datos del curso a actualizar.
+   * @returns {Promise<Course>} Curso actualizado.
+   * @throws {HttpException} Si el curso no existe o si los prerrequisitos no son válidos.
+   */
   async updateCourse(id: number, course: UpdateCourseDto) {
-    const courseFound = await this.courseRepository.findOne({
-      where: {
-        id: id,
-      },
-    });
+    const courseFound = await this.courseRepository.findOne({ where: { id } });
 
     if (!courseFound) {
       throw new HttpException('Course not found', HttpStatus.NOT_FOUND);
@@ -158,14 +183,4 @@ export class CoursesService {
     return this.courseRepository.save(updateCourse);
   }
 
-  async getPrerequisites(prerrequisitos: number[]): Promise<string[]> {
-    if (!prerrequisitos || prerrequisitos.length === 0) return [];
-
-    const prerequisites = await this.dataSource.query(
-      `SELECT nombre FROM courses WHERE id = ANY($1)`,
-      [prerrequisitos],
-    );
-
-    return prerequisites.map((p) => p.nombre);
-  }
 }
