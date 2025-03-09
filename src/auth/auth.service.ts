@@ -12,7 +12,7 @@ export class AuthService {
 
   async validateUser({ username, password }: AuthPayloadDto) {
     const userFound = await this.userService.getUser(username);
-
+    
     if (userFound.password === password) {
       const { password, ...user } = userFound;
       return this.jwtService.sign(user);
