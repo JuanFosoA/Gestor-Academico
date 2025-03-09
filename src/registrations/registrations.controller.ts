@@ -13,9 +13,10 @@ import { Registration } from './registration.entity';
 import { CreateRegistrationDto } from './dto/create-registration-dto';
 import { UpdateRegistrationDto } from './dto/update-registration-dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guards';
+import { NoAuthGuard } from 'src/auth/NotAuthGuard';
 
 @Controller('registrations')
-@UseGuards(JwtAuthGuard)
+@UseGuards(NoAuthGuard)
 export class RegistrationsController {
   constructor(private registrationService: RegistrationsService) {}
   @Get()

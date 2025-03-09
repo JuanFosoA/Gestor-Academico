@@ -13,9 +13,10 @@ import { CreateDepartmentDto } from './dto/create-department.dto';
 import { DepartmentsService } from './departments.service';
 import { Department } from './department.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guards';
+import { NoAuthGuard } from 'src/auth/NotAuthGuard';
 
 @Controller('departments')
-@UseGuards(JwtAuthGuard)
+@UseGuards(NoAuthGuard)
 export class DepartmentsController {
   constructor(private deparmentsService: DepartmentsService) {}
 

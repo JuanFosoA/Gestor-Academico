@@ -66,12 +66,12 @@ export class RegistrationsService {
   }
 
   async deleteRegistration(id: number) {
-    const result = await this.registrationRepository.delete({ id });
+    const result = await this.registrationRepository.update({id},{estado: RegistrationStatus.CANCELADO});
 
     if (result.affected === 0) {
       return new HttpException('Registration not found', HttpStatus.NOT_FOUND);
     }
-    return result;
+    return { message: 'Registration status updated to CANCELADO', result }
   }
 
   async updateRegistration(id: number, user: UpdateRegistrationDto) {
