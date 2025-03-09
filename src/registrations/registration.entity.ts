@@ -15,6 +15,7 @@ export enum RegistrationStatus {
   CURSANDO = 'cursando',
   REPROBADO = 'reprobado',
   APROBADO = 'aprobado',
+  CANCELADO = 'cancelado'
 }
 
 @Entity({ name: 'registrations' })

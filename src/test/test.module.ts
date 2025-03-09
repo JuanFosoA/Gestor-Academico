@@ -5,10 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Test } from './test.entity';
 import { CoursesModule } from 'src/courses/courses.module';
 import { StudentsModule } from 'src/students/students.module';
+import { Registration } from 'src/registrations/registration.entity';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([Test]),
+    TypeOrmModule.forFeature([Test,Registration]),
     CoursesModule,
     StudentsModule
   ],

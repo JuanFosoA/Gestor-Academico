@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { CreateTestDto } from './dto/create-test-dto';
 import { UpdateTestDto } from './dto/update-test-dto';
 import { Test } from './test.entity';
+import { Registration } from 'src/registrations/registration.entity';
 
 @Injectable()
 export class TestService {
@@ -14,8 +15,10 @@ export class TestService {
     private testRepository: Repository<Test>,
     private coursesService: CoursesService,
     private studetService: StudentsService,
+    @InjectRepository(Registration)
+    private registrationRepository:Repository<Registration>
   ) {}
-
+  private averageCache: { [key: string]: number | null } = {}
   async createTest(test: CreateTestDto) {
     const { courseId, studentDocument } = test;
 
@@ -23,8 +26,14 @@ export class TestService {
     await this.studetService.getStudent(studentDocument);
 
     const newTest = this.testRepository.create({ ...test });
+    await this.testRepository.save(newTest);
+    const average = await this.getAverageGrade(studentDocument, courseId);
+    this.averageCache[`${studentDocument}-${courseId}`] = average;
 
-    return this.testRepository.save(newTest);
+    return {
+      message: 'Test created successfully',
+      test: newTest,
+    };
   }
 
   async getTests() {
@@ -59,4 +68,28 @@ export class TestService {
     }
     return result;
   }
+
+  async getAverageGrade(
+    studentDocument: string,
+    courseId: number,
+  ): Promise<number | null> {
+    const result = await this.testRepository
+      .createQueryBuilder('test')
+      .select('AVG(test.grade)', 'average')
+      .where('test.studentDocument = :studentDocument', { studentDocument })
+      .andWhere('test.courseId = :courseId', { courseId })
+      .getRawOne();
+
+    return result?.average ? parseFloat(result.average) : null;
+  }
+
+  async updateEnrollmentGrade(studentDocument: string, courseId: number, average: number) {
+    await this.registrationRepository
+        .createQueryBuilder()
+        .update('registrations')
+        .set({ nota_final: average })
+        .where('studentDocument = :studentDocument', { studentDocument })
+        .andWhere('courseId = :courseId', { courseId })
+        .execute();
+}
 }
