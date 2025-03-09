@@ -6,13 +6,16 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { TeachersService } from './teachers.service';
 import { Teacher } from './teacher.entity';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guards';
 
 @Controller('teachers')
+@UseGuards(JwtAuthGuard)
 export class TeachersController {
   constructor(private teacherService: TeachersService) {}
 
