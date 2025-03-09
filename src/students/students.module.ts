@@ -4,6 +4,7 @@ import { StudentsService } from './students.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Student } from './student.entity';
 import { Registration } from 'src/registrations/registration.entity';
+import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Student, Registration])],
