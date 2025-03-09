@@ -8,7 +8,7 @@ import { Registration } from 'src/registrations/registration.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Student, Registration])],
   controllers: [StudentsController],
-  providers: [StudentsService],
+  providers: [StudentsService, JwtStrategy],
   exports: [StudentsService]
 })
 export class StudentsModule {}
