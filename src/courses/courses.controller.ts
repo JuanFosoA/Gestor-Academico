@@ -14,7 +14,6 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { Course } from './course.entity';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guards';
-
 /**
  * Controlador para gestionar los cursos.
  * Protegido con autenticación JWT.

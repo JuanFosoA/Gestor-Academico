@@ -5,9 +5,9 @@ services:
     container_name: gestor_academico_container
     restart: always
     environment:
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${mi_usuario}
+      POSTGRES_PASSWORD: ${hola123}
+      POSTGRES_DB: ${gestor_academico}
     ports:
       - "5432:5432"
     volumes:
